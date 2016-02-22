@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.wearable.view.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background = "@color/white"
+    tools:context="edu.dartmouth.cs.watchacccollector.MainActivity"
+    tools:deviceIds="wear">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        app:layout_box="all">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="99dp"
+            android:id="@+id/appIcon"
+            android:layout_gravity="top|center"
+            android:gravity="center_horizontal"
+            android:src = "@drawable/blue_handshack"/>
+
+        <ToggleButton
+            android:id="@+id/StartButton"
+            android:text="@string/startShack"
+            android:layout_width="136dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom" />
+
+
+    </FrameLayout>
+
+
+</android.support.wearable.view.BoxInsetLayout>
