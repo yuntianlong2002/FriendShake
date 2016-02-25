@@ -27,4 +27,5 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="title_activity_contact_list">ContactListActivity</string>
 </resources>
