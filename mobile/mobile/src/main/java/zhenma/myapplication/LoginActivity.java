@@ -205,7 +205,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     System.out.println("User ID: " + authData.getUid() + ", Provider: " + authData.getProvider());
                     Intent intent = new Intent(LoginActivity.this, ContactListActivity.class);
                     intent.putExtra("UID", authData.getUid());
-//                    intent.putExtra("EMAIL", email);
+                    intent.putExtra("EMAIL", email);
                     startActivity(intent);
                 }
 
@@ -218,7 +218,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             Toast.makeText(getApplicationContext(), "Successfully created user account", Toast.LENGTH_LONG).show();
                             System.out.println("Successfully created user account with uid: " + result.get("uid"));
                             Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
-//                            intent.putExtra("UID", authData.getUid());
+                            intent.putExtra("UID", "" + result.get("uid"));
                             intent.putExtra("EMAIL", email);
                             startActivity(intent);
                         }
