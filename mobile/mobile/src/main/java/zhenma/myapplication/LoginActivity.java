@@ -47,17 +47,45 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     public class User {
         private int birthYear;
         private String label;
+        private String username;
+        private String email;
+        private int number;
+        private String position;
+
         public User() {}
-        public User(String label, int birthYear) {
+        public User(String label, int birthYear, String username, String email, int number, String position) {
             this.label = label;
             this.birthYear = birthYear;
+            this.username = username;
+            this.email = email;
+            this.number = number;
+            this.position = position;
         }
         public long getBirthYear() {
             return birthYear;
         }
-        public String getFullName() {
+        public String getLabel() {
             return label;
         }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public int getNumber() {
+            return number;
+        }
+
+        public String getPosition() {
+            return position;
+        }
+
+
+
     }
 
     /**
@@ -239,8 +267,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
                             Firebase newRef = myFirebaseRef.child("vertex").child(""+result.get("uid"));
-
-                            User newUser = new User("New User", 1989);
+                            //this.username = username;
+                            //this.email = email;
+                            //this.number = number;
+                            //this.position = position;
+                            User newUser = new User("New User", 1989, "New User", email, 0, "");
                             newRef.setValue(newUser);
 
 
