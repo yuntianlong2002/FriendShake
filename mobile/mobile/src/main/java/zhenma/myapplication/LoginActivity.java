@@ -44,6 +44,50 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
+    public class User {
+        private int birthYear;
+        private String label;
+        private String username;
+        private String email;
+        private int number;
+        private String position;
+
+        public User() {}
+        public User(String label, int birthYear, String username, String email, int number, String position) {
+            this.label = label;
+            this.birthYear = birthYear;
+            this.username = username;
+            this.email = email;
+            this.number = number;
+            this.position = position;
+        }
+        public long getBirthYear() {
+            return birthYear;
+        }
+        public String getLabel() {
+            return label;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public int getNumber() {
+            return number;
+        }
+
+        public String getPosition() {
+            return position;
+        }
+
+
+
+    }
+
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -203,6 +247,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 public void onAuthenticated(AuthData authData) {
                     Toast.makeText(getApplicationContext(), "Login Success", Toast.LENGTH_LONG).show();
                     System.out.println("User ID: " + authData.getUid() + ", Provider: " + authData.getProvider());
+
+
+
                     Intent intent = new Intent(LoginActivity.this, ContactListActivity.class);
                     intent.putExtra("UID", authData.getUid());
                     intent.putExtra("EMAIL", email);
@@ -217,6 +264,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         public void onSuccess(Map<String, Object> result) {
                             Toast.makeText(getApplicationContext(), "Successfully created user account", Toast.LENGTH_LONG).show();
                             System.out.println("Successfully created user account with uid: " + result.get("uid"));
+
+
+                            Firebase newRef = myFirebaseRef.child("vertex").child(""+result.get("uid"));
+                            //this.username = username;
+                            //this.email = email;
+                            //this.number = number;
+                            //this.position = position;
+                            User newUser = new User("New User", 1989, "New User", email, 0, "");
+                            newRef.setValue(newUser);
+
+
                             Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
                             intent.putExtra("UID", "" + result.get("uid"));
                             intent.putExtra("EMAIL", email);
