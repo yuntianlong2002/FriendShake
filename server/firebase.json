@@ -1,5 +1,5 @@
 {
-  "firebase": "graph-data",
+  "firebase": "graphdata",
   "public": ".",
   "ignore": [
     "firebase.json",

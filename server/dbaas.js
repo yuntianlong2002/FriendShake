@@ -4,7 +4,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
   // Object.keys( data.val() )[0]
 
   Channel = $.extend( {}, Backbone.Events );
-  ref       = new Firebase("https://graph-data.firebaseio.com");
+  ref       = new Firebase("https://graphdata.firebaseio.com");
   vertexRef = ref.child('vertex');
   edgeRef   = ref.child('edge');
 
@@ -56,7 +56,9 @@ define(['jquery', 'backbone'], function($, Backbone) {
       Channel.trigger( 'node-added', {
         id: data.key(),
         label: data.val().label,
-        color: data.val().color
+        color: data.val().color,
+        email: data.val().email,
+        phone: data.val().phone
       } );
     });
 
@@ -64,7 +66,9 @@ define(['jquery', 'backbone'], function($, Backbone) {
       Channel.trigger( 'node-edited', {
         id: data.key(),
         label: data.val().label,
-        color: data.val().color
+        color: data.val().color,
+        email: data.val().email,
+        phone: data.val().phone
       } );
     });
 
@@ -118,7 +122,9 @@ define(['jquery', 'backbone'], function($, Backbone) {
   Channel.on('add-node', function( node, cb ) {
     var vertex = vertexRef.push({
       label: node.label || '',
-      color: node.color || ''
+      color: node.color || '',
+      email: node.email || '',
+      phone: node.phone || ''
     }, function() {
       if (cb) {
         node.id = vertex.key();
@@ -131,7 +137,9 @@ define(['jquery', 'backbone'], function($, Backbone) {
     if (node && node.id) {
       vertexRef.child(node.id).update({
         label: node.label || '',
-        color: node.color || ''
+        color: node.color || '',
+        email: node.email || '',
+        phone: node.phone || ''
       });
     }
   } );
