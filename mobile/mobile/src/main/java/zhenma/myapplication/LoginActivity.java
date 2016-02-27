@@ -250,7 +250,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
 
-                    Intent intent = new Intent(LoginActivity.this, ContactListActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.putExtra("UID", authData.getUid());
                     intent.putExtra("EMAIL", email);
                     startActivity(intent);
