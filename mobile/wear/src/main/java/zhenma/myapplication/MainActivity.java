@@ -12,7 +12,6 @@ import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.util.Log;
 import android.widget.CompoundButton;
-import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.io.File;
@@ -72,9 +71,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     /*
 	 * Various UI components
 	 */
-    private TextView stepsView;
-    private TextView activityView;
-    private TextView rawView;
     private CompoundButton accelButton;
 
     //classifier
@@ -103,9 +99,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-
-        stepsView = (TextView)findViewById(R.id.stepCount);
-        activityView = (TextView)findViewById(R.id.textView);
 
         accelButton = (ToggleButton) findViewById(R.id.StartButton);
         accelButton.setChecked(isAccelRunning);

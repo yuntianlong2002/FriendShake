@@ -23,14 +23,11 @@
             android:gravity="center_horizontal"
             android:src = "@drawable/blue_handshack"/>
 
-        <Switch
+        <ToggleButton
             android:id="@+id/StartButton"
-            android:text="@string/startShack"
             android:layout_width="136dp"
-            android:textColor="@color/black"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|bottom" />
-
 
     </FrameLayout>
 
