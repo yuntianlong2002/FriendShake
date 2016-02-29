@@ -18,7 +18,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -26,9 +29,20 @@ import java.util.concurrent.LinkedBlockingDeque;
 import zhenma.myapplication.accelerometer.Filter;
 import meapsoft.FFT;
 
-public class MainActivity extends WearableActivity implements SensorEventListener {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
+
+public class MainActivity extends WearableActivity implements SensorEventListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private BoxInsetLayout mContainerView;
+
+    GoogleApiClient mGoogleApiClient;
+    Node mNode;
 
     /**
      * Filter class required to filter noise from accelerometer
@@ -85,6 +99,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setAmbientEnabled();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
 
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
 
@@ -165,6 +185,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
      * start accelerometer
      */
     private void startAccelerometer() {
+        mGoogleApiClient.connect();
         isAccelRunning = true;
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
         //Set up filter
@@ -181,11 +202,68 @@ public class MainActivity extends WearableActivity implements SensorEventListene
      * stop accelerometer
      */
     private void stopAccelerometer() {
+        mGoogleApiClient.disconnect();
         isAccelRunning = false;
         mSensorManager.unregisterListener(this);
 
         //Free filter and step detector
         filter = null;
+    }
+
+    /**
+     * Resolve the node = the connected device to send the message to
+     */
+    private void resolveNode() {
+
+        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient)
+                .setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+                    @Override
+                    public void onResult(NodeApi.GetConnectedNodesResult nodes) {
+                        for (Node node : nodes.getNodes()) {
+                            mNode = node;
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        resolveNode();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    /**
+     * Send message to mobile handheld
+     */
+    private void sendMessage(String Key) {
+
+        if (mNode != null && mGoogleApiClient!= null && mGoogleApiClient.isConnected()) {
+            Log.d("WearToPhone", "-- " + mGoogleApiClient.isConnected());
+            Wearable.MessageApi.sendMessage(
+                    mGoogleApiClient, mNode.getId(), "ID" + "--" + Key, null).setResultCallback(
+
+                    new ResultCallback<MessageApi.SendMessageResult>() {
+                        @Override
+                        public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+
+                            if (!sendMessageResult.getStatus().isSuccess()) {
+                                Log.e("WearToPhone", "Failed to send message with status code: "
+                                        + sendMessageResult.getStatus().getStatusCode());
+                            }
+                        }
+                    }
+            );
+        }
+
     }
 
     @Override
@@ -308,6 +386,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     private void sendshakeSignal() {
+        //DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        //Date date = new Date();
+        //String currentTimeStamp = dateFormat.format(date); //2014/08/06 15:59:48
+
+        String currentTimeStamp = "" + System.currentTimeMillis();
+        sendMessage("Current Time: " + currentTimeStamp);
         /**
          * save raw data to a file
          */
