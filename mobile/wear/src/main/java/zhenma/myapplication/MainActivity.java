@@ -384,7 +384,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         //String currentTimeStamp = dateFormat.format(date); //2014/08/06 15:59:48
 
         String currentTimeStamp = "" + System.currentTimeMillis();
-        sendMessage("Current Time: " + currentTimeStamp);
+        sendMessage(currentTimeStamp);
         stopAccelerometer();
         SystemClock.sleep(3000);
         startAccelerometer();
