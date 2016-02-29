@@ -1,5 +1,7 @@
 package zhenma.myapplication;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -8,6 +10,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,17 +38,42 @@ public class MainActivity extends KJActivity implements SideBar
     private ListView mListView;
     private ContactAdapter mAdapter;
     private ArrayList<Contact> datas = new ArrayList<>();
+    private ArrayList<String> ids = new ArrayList<>();
     private TextView mFooterView;
     private KJHttp kjh = null;
+    private String id;
+    private Firebase myFirebaseRef;
 
     @Override
     public void setRootView() {
         setContentView(R.layout.activity_main);
     }
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        Firebase.setAndroidContext(this);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Firebase.setAndroidContext(this);
+        Intent intent = getIntent();
+        id = "";
+        id = intent.getStringExtra("UID");
+        myFirebaseRef = new Firebase("https://graphdata.firebaseio.com/");
+
+        myFirebaseRef.child("vertex").child(id).child("friendlist").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                System.out.println(snapshot.getValue());  //prints "Do you have data? You'll love Firebase."
+                System.out.println("There are " + snapshot.getChildrenCount() + " blog posts");
+                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                    String friend_id = postSnapshot.getKey();
+                    ids.add(friend_id);
+                    System.out.println(friend_id);
+                }
+                parser(ids);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError error) {
+            }
+        });
 //
 //        // initWidget()
 //        super.initWidget();
@@ -65,7 +97,7 @@ public class MainActivity extends KJActivity implements SideBar
 //                        .setAction("Action", null).show();
 //            }
 //        });
-//    }
+    }
 
     @Override
     public void initData() {
@@ -98,17 +130,30 @@ public class MainActivity extends KJActivity implements SideBar
     }
 
     private void doHttp() {
-        kjh.get("http://zb.oschina.net/action/zbApi/contacts_list?uid=863548", new HttpCallBack() {
+        /*kjh.get("http://zb.oschina.net/action/zbApi/contacts_list?uid=863548", new HttpCallBack() {
             @Override
             public void onSuccess(String t) {
                 super.onSuccess(t);
                 parser(t);
             }
-        });
+        });*/
+    }
+
+    private void parser(ArrayList<String> ids) {
+        for (String id: ids) {
+            Contact data = new Contact();
+            data.setName(id);
+            data.setPinyin(id);
+            data.setUrl(id);
+            datas.add(data);
+        }
+        mFooterView.setText(datas.size() + "位联系人");
+        mAdapter = new ContactAdapter(mListView, datas);
+        mListView.setAdapter(mAdapter);
     }
 
     private void parser(String json) {
-        try {
+        /*try {
             JSONArray array = new JSONArray(json);
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.optJSONObject(i);
@@ -124,7 +169,7 @@ public class MainActivity extends KJActivity implements SideBar
             mListView.setAdapter(mAdapter);
         } catch (JSONException e) {
             KJLoger.debug("解析异常" + e.getMessage());
-        }
+        }*/
     }
 
     @Override
