@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -44,6 +45,37 @@ public class MainActivity extends KJActivity implements SideBar
     private String id;
     private Firebase myFirebaseRef;
 
+    @JsonIgnoreProperties({ "friendlist" })
+    public static class UserProfile {
+        private String birthYear;
+        private String email;
+        private String label;
+        private String number;
+        private String position;
+        private String username;
+
+        public String getBirthYear() {
+            return birthYear;
+        }
+        public String getEmail() {
+            return email;
+        }
+        public String getLabel() {
+            return label;
+        }
+        public String getNumber() {
+            return number;
+        }
+        public String getPosition() {
+            return position;
+        }
+        public String getUsername() {
+            return username;
+        }
+    }
+
+
+
     @Override
     public void setRootView() {
         setContentView(R.layout.activity_main);
@@ -57,13 +89,20 @@ public class MainActivity extends KJActivity implements SideBar
         id = intent.getStringExtra("UID");
         myFirebaseRef = new Firebase("https://graphdata.firebaseio.com/");
 
-        myFirebaseRef.child("vertex").child(id).child("friendlist").addValueEventListener(new ValueEventListener() {
+        myFirebaseRef.child("vertex").child(id).child("friendlist").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 System.out.println(snapshot.getValue());  //prints "Do you have data? You'll love Firebase."
                 System.out.println("There are " + snapshot.getChildrenCount() + " blog posts");
-                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+                    //Contact data = new Contact();
                     String friend_id = postSnapshot.getKey();
+                    //UserProfile facts = postSnapshot.getValue(UserProfile.class);
+                    //System.out.println(facts.getLabel());
+                    //data.setName(facts.getLabel());
+                    //data.setPinyin(facts.getLabel());
+                    //data.setUrl(id);
+                    //datas.add(data);
                     ids.add(friend_id);
                     System.out.println(friend_id);
                 }
@@ -140,16 +179,31 @@ public class MainActivity extends KJActivity implements SideBar
     }
 
     private void parser(ArrayList<String> ids) {
-        for (String id: ids) {
-            Contact data = new Contact();
-            data.setName(id);
-            data.setPinyin(id);
-            data.setUrl(id);
-            datas.add(data);
+        for (String friend_id: ids) {
+            //final Contact data = new Contact();
+            System.out.println(friend_id);
+            myFirebaseRef.child("vertex").child(friend_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    Contact data = new Contact();
+                    UserProfile facts = snapshot.getValue(UserProfile.class);
+                    System.out.println(facts.getLabel());
+                    data.setName(facts.getLabel());
+                    data.setPinyin(facts.getLabel());
+                    datas.add(data);
+                    mFooterView.setText(datas.size() + " friends");
+                    mAdapter = new ContactAdapter(mListView, datas);
+                    mListView.setAdapter(mAdapter);
+                }
+                @Override
+                public void onCancelled(FirebaseError error) {
+                }
+            });
+
+            //data.setUrl(id);
+            //datas.add(data);
         }
-        mFooterView.setText(datas.size() + "位联系人");
-        mAdapter = new ContactAdapter(mListView, datas);
-        mListView.setAdapter(mAdapter);
+
     }
 
     private void parser(String json) {
