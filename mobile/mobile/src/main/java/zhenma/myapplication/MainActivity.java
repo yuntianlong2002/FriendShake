@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,15 +18,10 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.kymjs.kjframe.KJActivity;
 import org.kymjs.kjframe.KJHttp;
-import org.kymjs.kjframe.http.HttpCallBack;
 import org.kymjs.kjframe.http.HttpConfig;
 import org.kymjs.kjframe.ui.BindView;
-import org.kymjs.kjframe.utils.KJLoger;
 
 import java.util.ArrayList;
 
@@ -113,29 +109,6 @@ public class MainActivity extends KJActivity implements SideBar
             public void onCancelled(FirebaseError error) {
             }
         });
-//
-//        // initWidget()
-//        super.initWidget();
-//        SideBar mSideBar = (SideBar) findViewById(R.id.school_friend_sidrbar);
-//        TextView mDialog = (TextView) findViewById(R.id.school_friend_dialog);
-//        EditText mSearchInput = (EditText) findViewById(R.id.school_friend_member_search_input);
-//
-//        mSideBar.setTextView(mDialog);
-//        mSideBar.setOnTouchingLetterChangedListener(this);
-//        mSearchInput.addTextChangedListener(this);
-//
-//        // 给listView设置adapter
-//        mFooterView = (TextView) View.inflate(aty, R.layout.item_list_contact_count, null);
-//        mListView.addFooterView(mFooterView);
-//
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
     }
 
     @Override
@@ -165,6 +138,22 @@ public class MainActivity extends KJActivity implements SideBar
         mFooterView = (TextView) View.inflate(aty, R.layout.item_list_contact_count, null);
         mListView.addFooterView(mFooterView);
 
+        // if user clicks a picture
+        // then start a new activity, show a large picture to user
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            Intent i;
+
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                i = new Intent(MainActivity.this, ProfileActivity.class);
+                // send message to another activity: which picture user take
+//                i.putExtra("gridIndex", PSM.getGridById(index % 3 + 1)[position]);
+//                // send message to another activity: the pressure of this picture
+//                i.putExtra("pressure", pressure[position]);
+                // start activity
+                startActivity(i);
+            }
+        });
         doHttp();
     }
 

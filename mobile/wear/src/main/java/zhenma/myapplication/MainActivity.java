@@ -12,22 +12,8 @@ import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.util.Log;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ToggleButton;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.LinkedBlockingDeque;
-
-import zhenma.myapplication.accelerometer.Filter;
-import meapsoft.FFT;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -36,6 +22,18 @@ import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
+
+import meapsoft.FFT;
+import zhenma.myapplication.accelerometer.Filter;
 
 public class MainActivity extends WearableActivity implements SensorEventListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -92,6 +90,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     public static final int BLOCK_QUEUE_CAPACITY =  64;
     private List<Double> fectureVec;
     private ClassificationAsyncTask classificationAsyncTask;
+    private ImageView appIcon;
 
 
     @Override
@@ -107,6 +106,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 .build();
 
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
+        appIcon = (ImageView) findViewById(R.id.appIcon);
 
         // Init files !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         shakeSignalFile = new File(Environment.getExternalStorageDirectory(), "shake_signal.csv");
@@ -127,10 +127,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                     public void onCheckedChanged(CompoundButton btn,boolean isChecked) {
                         if(!isAccelRunning) {
                             startAccelerometer();
+                            appIcon.setImageResource(R.drawable.green_handshack);
                             accelButton.setChecked(true);
                         }
                         else {
                             stopAccelerometer();
+                            appIcon.setImageResource(R.drawable.blue_handshack);
                             accelButton.setChecked(false);
                         }
                     }
@@ -158,27 +160,19 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     @Override
     public void onEnterAmbient(Bundle ambientDetails) {
         super.onEnterAmbient(ambientDetails);
-        updateDisplay();
+//        updateDisplay();
     }
 
     @Override
     public void onUpdateAmbient() {
         super.onUpdateAmbient();
-        updateDisplay();
+//        updateDisplay();
     }
 
     @Override
     public void onExitAmbient() {
-        updateDisplay();
+//        updateDisplay();
         super.onExitAmbient();
-    }
-
-    private void updateDisplay() {
-        if (isAmbient()) {
-            mContainerView.setBackgroundColor(getResources().getColor(android.R.color.black));
-        } else {
-            mContainerView.setBackground(null);
-        }
     }
 
     /**
@@ -305,7 +299,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 if(blockQueue.size() < BLOCK_QUEUE_CAPACITY){
                     continue;
                 }
-//                Log.i(TAG,"doInBackground >= 64");
                 double[] re = new double[BLOCK_QUEUE_CAPACITY];
                 double[] im = new double[BLOCK_QUEUE_CAPACITY];
 
@@ -392,10 +385,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         String currentTimeStamp = "" + System.currentTimeMillis();
         sendMessage("Current Time: " + currentTimeStamp);
+        stopAccelerometer();
+        SystemClock.sleep(3000);
+        startAccelerometer();
+
         /**
          * save raw data to a file
          */
-        Log.d("Shake", "Senht"+shakeSignalQueue.size());
+        Log.d("Shake", "Sent"+shakeSignalQueue.size());
         String record ="";
         LinkedList<Double> copy = new LinkedList<Double>(shakeSignalQueue);
         for (Double signal : copy) {
