@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,12 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,7 +40,8 @@ import zhenma.myapplication.bean.Contact;
 import zhenma.myapplication.widget.SideBar;
 
 public class MainActivity extends KJActivity implements SideBar
-        .OnTouchingLetterChangedListener, TextWatcher {
+        .OnTouchingLetterChangedListener, TextWatcher, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     @BindView(id = R.id.school_friend_member)
     private ListView mListView;
@@ -44,6 +52,12 @@ public class MainActivity extends KJActivity implements SideBar
     private KJHttp kjh = null;
     private String id;
     private Firebase myFirebaseRef;
+
+    private static final String TAG = "PhoneActivity";
+    public static final String CONFIG_START = "config/start";
+    public static final String CONFIG_STOP= "config/stop";
+
+    GoogleApiClient mGoogleApiClient;
 
     @JsonIgnoreProperties({ "friendlist" })
     public static class UserProfile {
@@ -80,9 +94,42 @@ public class MainActivity extends KJActivity implements SideBar
     public void setRootView() {
         setContentView(R.layout.activity_main);
     }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.v(TAG,"onConnectionSuspended called");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.v(TAG,"onConnectionFailed called");
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.v(TAG, "onConnected called");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(null == mGoogleApiClient) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(Wearable.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+            Log.v(TAG, "GoogleApiClient created");
+        }
+
+        if(!mGoogleApiClient.isConnected()){
+            mGoogleApiClient.connect();
+            Log.v(TAG, "Connecting to GoogleApiClient..");
+        }
+
+        startService(new Intent(this, WearCallListenerService.class));
+
         Firebase.setAndroidContext(this);
         Intent intent = getIntent();
         id = "";
@@ -113,6 +160,8 @@ public class MainActivity extends KJActivity implements SideBar
             public void onCancelled(FirebaseError error) {
             }
         });
+
+        new SendActivityPhoneMessage(CONFIG_START+"--"+id,"").start();
 //
 //        // initWidget()
 //        super.initWidget();
@@ -284,5 +333,31 @@ public class MainActivity extends KJActivity implements SideBar
     @Override
     public void afterTextChanged(Editable s) {
 
+    }
+
+    class SendActivityPhoneMessage extends Thread {
+        String path;
+        String message;
+
+        // Constructor to send a message to the data layer
+        SendActivityPhoneMessage(String p, String msg) {
+            path = p;
+            message = msg;
+        }
+
+        public void run() {
+            NodeApi.GetLocalNodeResult nodes = Wearable.NodeApi.getLocalNode(mGoogleApiClient).await();
+            Node node = nodes.getNode();
+            Log.v(TAG, "Activity Node is : "+node.getId()+ " - " + node.getDisplayName());
+            MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, message.getBytes()).await();
+            if (result.getStatus().isSuccess()) {
+                Log.v(TAG, "Activity Message: {" + message + "} sent to: " + node.getDisplayName());
+            }
+            else {
+                // Log an error
+                Log.v(TAG, "ERROR: failed to send Activity Message");
+            }
+
+        }
     }
 }
