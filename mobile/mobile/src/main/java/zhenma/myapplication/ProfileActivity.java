@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -231,7 +232,7 @@ public class ProfileActivity extends AppCompatActivity {
         key = getString(R.string.preference_key_profile_phone);
         str_val = ((EditText) findViewById(R.id.editPhone)).getText()
                 .toString();
-        newRef.child("phone").setValue(str_val);
+        newRef.child("number").setValue(str_val);
         //editor.putString(key, str_val);
 
         key = getString(R.string.preference_key_profile_tittle);
@@ -371,6 +372,17 @@ public class ProfileActivity extends AppCompatActivity {
         loadProfile(id);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        Bundle extras = getIntent().getExtras();
+        boolean fromList = false;
+        if (extras != null){
+            fromList = extras.getBoolean("FROM_LIST");
+        }
+        if (fromList){
+            CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+            p.setAnchorId(View.NO_ID);
+            fab.setLayoutParams(p);
+            fab.setVisibility(View.GONE);
+        }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
