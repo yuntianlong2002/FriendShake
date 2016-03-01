@@ -2,6 +2,7 @@ package zhenma.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.firebase.client.DataSnapshot;
@@ -181,6 +183,22 @@ public class MainActivity extends KJActivity implements SideBar
         mSideBar.setTextView(mDialog);
         mSideBar.setOnTouchingLetterChangedListener(this);
         mSearchInput.addTextChangedListener(this);
+
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Making a "toast" informing the user the profile is saved.
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.ui_profile_toast_save_text),
+                        Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                intent.putExtra("FROM_LIST",true);
+                intent.putExtra("UID", id);
+                startActivity(intent);
+            }
+        });
 
         // 给listView设置adapter
         mFooterView = (TextView) View.inflate(aty, R.layout.item_list_contact_count, null);
