@@ -134,11 +134,12 @@ public class MainActivity extends KJActivity implements SideBar
         id = intent.getStringExtra("UID");
         myFirebaseRef = new Firebase("https://graphdata.firebaseio.com/");
 
-        myFirebaseRef.child("vertex").child(id).child("friendlist").addListenerForSingleValueEvent(new ValueEventListener() {
+        myFirebaseRef.child("vertex").child(id).child("friendlist").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 System.out.println(snapshot.getValue());  //prints "Do you have data? You'll love Firebase."
                 System.out.println("There are " + snapshot.getChildrenCount() + " blog posts");
+                ids.clear();
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     //Contact data = new Contact();
                     String friend_id = postSnapshot.getKey();
@@ -235,6 +236,7 @@ public class MainActivity extends KJActivity implements SideBar
     }
 
     private void parser(ArrayList<String> ids) {
+        datas.clear();
         for (String friend_id: ids) {
             //final Contact data = new Contact();
             System.out.println(friend_id);
