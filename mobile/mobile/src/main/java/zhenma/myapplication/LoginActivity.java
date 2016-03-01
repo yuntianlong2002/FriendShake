@@ -275,7 +275,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             newRef.setValue(newUser);
 
 
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
                             intent.putExtra("UID", "" + result.get("uid"));
                             intent.putExtra("EMAIL", email);
                             startActivity(intent);

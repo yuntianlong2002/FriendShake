@@ -7,13 +7,13 @@
     <string name="profile_email_title">Email</string>
     <string name="profile_psw_title">Password</string>
     <string name="profile_phone_title">Phone</string>
-    <string name="profile_position_title">Work Position</string>
+    <string name="profile_position_title">Tittle</string>
     <string name="profile_psw_hint">*******</string>
     <string name="profile_phone_hint">6033333333</string>
     <string name="profile_email_hint">Email@dartmouth.edu</string>
     <string name="profile_name_hint">Username</string>
     <string name="profile_position_hint">The description of working position</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">FriendShake</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -28,4 +28,15 @@
         completions."
     </string>
     <string name="title_activity_contact_list">ContactListActivity</string>
+
+    <!--strings related to profile-->
+    <string name="preference_private">shared_preference</string>
+    <string name="preference_key_profile_name">profile_name</string>
+    <string name="preference_key_profile_email">profile_email</string>
+    <string name="preference_key_profile_psw">profile_password</string>
+    <string name="preference_key_profile_phone">profile_phone</string>
+    <string name="preference_key_profile_tittle">profile_tittle</string>
+    <string name="profile_photo_file_name">profile_photo.png</string>
+    <string name="ui_profile_toast_save_text">profile saved!</string>
+
 </resources>

@@ -200,6 +200,7 @@ public class MainActivity extends KJActivity implements SideBar
 //                // send message to another activity: the pressure of this picture
 //                i.putExtra("pressure", pressure[position]);
                 // start activity
+                i.putExtra("UID", ids.get(position));
                 startActivity(i);
             }
         });
