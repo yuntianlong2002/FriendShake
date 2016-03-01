@@ -93,7 +93,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="phone"
+                android:inputType="textPassword"
                 android:ems="10"
                 android:id="@+id/editPsw"
                 android:hint="@string/profile_psw_hint" />
@@ -127,7 +127,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/editZipcode"
+                android:id="@+id/editTittle"
                 android:inputType="textCapWords"
                 android:hint="@string/profile_position_hint" />
 
@@ -143,6 +143,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
+        android:src="@drawable/ic_save" />
 
 </android.support.design.widget.CoordinatorLayout>
