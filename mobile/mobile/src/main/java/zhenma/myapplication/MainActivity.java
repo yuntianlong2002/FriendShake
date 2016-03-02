@@ -192,10 +192,9 @@ public class MainActivity extends KJActivity implements SideBar
             public void onClick(View view) {
                 // Making a "toast" informing the user the profile is saved.
                 Toast.makeText(getApplicationContext(),
-                        getString(R.string.ui_profile_toast_save_text),
+                        getString(R.string.ui_toast_to_profile),
                         Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                intent.putExtra("FROM_LIST",true);
                 intent.putExtra("UID", id);
                 startActivity(intent);
             }
@@ -218,6 +217,7 @@ public class MainActivity extends KJActivity implements SideBar
 //                // send message to another activity: the pressure of this picture
 //                i.putExtra("pressure", pressure[position]);
                 // start activity
+                i.putExtra("FROM_LIST", true);
                 i.putExtra("UID", ids.get(position));
                 startActivity(i);
             }

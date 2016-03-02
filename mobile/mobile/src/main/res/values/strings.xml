@@ -38,5 +38,6 @@
     <string name="preference_key_profile_tittle">profile_tittle</string>
     <string name="profile_photo_file_name">profile_photo.png</string>
     <string name="ui_profile_toast_save_text">profile saved!</string>
+    <string name="ui_toast_to_profile">Edit your own profile!</string>
 
 </resources>
