@@ -1,5 +1,8 @@
 package zhenma.myapplication;
 
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,6 +14,7 @@ import android.os.SystemClock;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.util.Log;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ToggleButton;
@@ -34,6 +38,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import meapsoft.FFT;
 import zhenma.myapplication.accelerometer.Filter;
+
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 
 public class MainActivity extends WearableActivity implements SensorEventListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -134,6 +141,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                             stopAccelerometer();
                             appIcon.setImageResource(R.drawable.blue_handshack);
                             accelButton.setChecked(false);
+                            btnShowNotificationClick();
                         }
                     }
                 }
@@ -152,6 +160,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         try{
             shakeSignalOutputStream.close();
+            mGoogleApiClient.disconnect();
         }catch (Exception ex)
         {
         }
@@ -196,7 +205,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
      * stop accelerometer
      */
     private void stopAccelerometer() {
-        mGoogleApiClient.disconnect();
+        //mGoogleApiClient.disconnect();
         isAccelRunning = false;
         mSensorManager.unregisterListener(this);
 
@@ -392,7 +401,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         /**
          * save raw data to a file
          */
-        Log.d("Shake", "Sent"+shakeSignalQueue.size());
+        Log.d("Shake", "Sent" + shakeSignalQueue.size());
         String record ="";
         LinkedList<Double> copy = new LinkedList<Double>(shakeSignalQueue);
         for (Double signal : copy) {
@@ -403,6 +412,74 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             shakeSignalOutputStream.write(record.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void btnShowNotificationClick(){
+        int notificationId = 101;
+
+        // Create an intent for the reply action
+        Intent actionIntent = new Intent(this, MainActivity.class);
+        actionIntent.putExtra("methodName", "sendAcceptMessage");
+        actionIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent actionPendingIntent =
+                PendingIntent.getActivity(this, 0, actionIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Create the action
+        NotificationCompat.Action action =
+                new NotificationCompat.Action.Builder(R.drawable.red_handshack,
+                        getString(R.string.acceptButt), actionPendingIntent)
+                        .build();
+
+        //Building notification layout
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle("New Friend Request!")
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        .setContentText("Swipe left!")
+                        .extend(new NotificationCompat.WearableExtender().addAction(action));
+
+
+        // instance of the NotificationManager service
+        NotificationManagerCompat notificationManager =
+                NotificationManagerCompat.from(this);
+
+        // Build the notification and notify it using notification manager.
+        notificationManager.notify(notificationId, notificationBuilder.build());
+        Log.d("Notification", "Notify Sent!");
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d("WearToPhone", "I am in send accept message method!");
+        if(intent.getStringExtra("methodName").equals("sendAcceptMessage")){
+            sendAcceptMessage();
+        }
+    }
+
+    private void sendAcceptMessage() {
+        mGoogleApiClient.connect();
+        Log.d("WearToPhone", "I am in send accept message method!");
+        Log.d("WearToPhone", "-- " + mGoogleApiClient.isConnected());
+        if (mNode != null && mGoogleApiClient!= null && mGoogleApiClient.isConnected()) {
+            Log.d("WearToPhone", "-- " + mGoogleApiClient.isConnected());
+            Wearable.MessageApi.sendMessage(
+                    mGoogleApiClient, mNode.getId(), "AcceptSignal" + "--" + "Accept!", null).setResultCallback(
+
+                    new ResultCallback<MessageApi.SendMessageResult>() {
+                        @Override
+                        public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+
+                            if (!sendMessageResult.getStatus().isSuccess()) {
+                                Log.e("WearToPhone", "Failed to send message with status code: "
+                                        + sendMessageResult.getStatus().getStatusCode());
+                            }
+                        }
+                    }
+            );
         }
     }
 }

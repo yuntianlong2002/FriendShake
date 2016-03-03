@@ -101,8 +101,8 @@ public class WearCallListenerService extends WearableListenerService implements
 
         if(null != mGoogleApiClient){
             if(mGoogleApiClient.isConnected()){
-                mGoogleApiClient.disconnect();
-                Log.v(TAG, "GoogleApiClient disconnected");
+                //mGoogleApiClient.disconnect();
+                //Log.v(TAG, "GoogleApiClient disconnected");
             }
         }
 
