@@ -3,17 +3,21 @@ package zhenma.myapplication;
 /**
  * Created by RaymiGaga on 2/29/16.
  */
-import android.content.Intent;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
@@ -25,24 +29,26 @@ import com.google.android.gms.wearable.WearableListenerService;
  */
 public class WearCallListenerService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener{
+        GoogleApiClient.OnConnectionFailedListener {
 
     public static String SERVICE_CALLED_WEAR = "WearListClicked";
     private Firebase myFirebaseRef;
     private long last_shake_time = 0;
     private static final String TAG = "PhoneService";
     GoogleApiClient mGoogleApiClient;
+    GoogleApiClient mLocGoogleApiClient;
     public static final String CONFIG_START = "config/start";
     public static final String CONFIG_STOP = "config/stop";
     private String UID = "";
+    private Location mLastLocation;
 
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
         Firebase.setAndroidContext(this);
 
-        if(null == mGoogleApiClient) {
+        if (null == mGoogleApiClient) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addApi(Wearable.API)
                     .addConnectionCallbacks(this)
@@ -50,9 +56,17 @@ public class WearCallListenerService extends WearableListenerService implements
                     .build();
             Log.v(TAG, "GoogleApiClient created");
         }
+        if (mLocGoogleApiClient == null) {
+            mLocGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
 
-        if(!mGoogleApiClient.isConnected()){
+        if (!mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
+            mLocGoogleApiClient.connect();
             Log.v(TAG, "Connecting to GoogleApiClient..");
         }
 
@@ -62,11 +76,11 @@ public class WearCallListenerService extends WearableListenerService implements
             public void onChildAdded(DataSnapshot snapshot, String previousChildKey) {
                 String potential_friend_id = snapshot.getValue(String.class);
                 long friend_shake_time = Long.parseLong(snapshot.getKey());
-                if(Math.abs(friend_shake_time - last_shake_time)<10000 && !UID.equals(potential_friend_id)){
+                if (Math.abs(friend_shake_time - last_shake_time) < 10000 && !UID.equals(potential_friend_id)) {
                     Firebase newRef = myFirebaseRef.child("vertex").child(UID).child("friendlist").child(potential_friend_id);
                     newRef.setValue("1");
                     Firebase newRef_link = myFirebaseRef.child("edge").push();
-                    if(potential_friend_id.compareTo(UID)>0) {
+                    if (potential_friend_id.compareTo(UID) > 0) {
                         newRef_link.child("sourceId").setValue(potential_friend_id);
                         newRef_link.child("targetId").setValue(UID);
                     }
@@ -75,18 +89,22 @@ public class WearCallListenerService extends WearableListenerService implements
                 //System.out.println("Title: " + newPost.getTitle());
 
             }
+
             @Override
             public void onChildRemoved(DataSnapshot snapshot) {
 
             }
+
             @Override
             public void onChildChanged(DataSnapshot snapshot, String previousChildKey) {
 
             }
+
             @Override
             public void onChildMoved(DataSnapshot snapshot, String previousChildKey) {
 
             }
+
             @Override
             public void onCancelled(FirebaseError error) {
             }
@@ -99,9 +117,10 @@ public class WearCallListenerService extends WearableListenerService implements
 
         Log.v(TAG, "Destroyed");
 
-        if(null != mGoogleApiClient){
-            if(mGoogleApiClient.isConnected()){
+        if (null != mGoogleApiClient) {
+            if (mGoogleApiClient.isConnected()) {
                 mGoogleApiClient.disconnect();
+                mLocGoogleApiClient.disconnect();
                 Log.v(TAG, "GoogleApiClient disconnected");
             }
         }
@@ -111,18 +130,35 @@ public class WearCallListenerService extends WearableListenerService implements
 
     @Override
     public void onConnectionSuspended(int cause) {
-        Log.v(TAG,"onConnectionSuspended called");
+        Log.v(TAG, "onConnectionSuspended called");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.v(TAG,"onConnectionFailed called");
+        Log.v(TAG, "onConnectionFailed called");
     }
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.v(TAG,"onConnected called");
-
+        Log.v(TAG, "onConnected called");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mLocGoogleApiClient);
+        if (mLastLocation != null) {
+//            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
+//            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+            Log.d("Latitude: ", ""+ mLastLocation.getLatitude());
+            Log.d("Longitude: ", ""+ mLastLocation.getLongitude());
+        }
     }
 
     @Override
