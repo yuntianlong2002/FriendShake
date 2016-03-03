@@ -1,7 +1,5 @@
 package zhenma.myapplication;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -10,11 +8,9 @@ import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemClock;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.util.Log;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ToggleButton;
@@ -30,7 +26,6 @@ import com.google.android.gms.wearable.Wearable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,9 +33,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import meapsoft.FFT;
 import zhenma.myapplication.accelerometer.Filter;
-
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 
 public class MainActivity extends WearableActivity implements SensorEventListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -99,6 +91,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private ClassificationAsyncTask classificationAsyncTask;
     private ImageView appIcon;
 
+    private long lastSendTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -349,7 +342,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                     }else if(ret == 2.0){
                         //sendUpdatedActivityToUI("Running");
                     }else if(ret == 3.0){
-                        SystemClock.sleep(291);
+//                        SystemClock.sleep(291);
                         sendshakeSignal();
                     }
 
@@ -392,16 +385,21 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         //Date date = new Date();
         //String currentTimeStamp = dateFormat.format(date); //2014/08/06 15:59:48
 
-        String currentTimeStamp = "" + System.currentTimeMillis();
-        sendMessage(currentTimeStamp);
-        stopAccelerometer();
-        SystemClock.sleep(3000);
-        startAccelerometer();
+        long currentTime = System.currentTimeMillis();
+        String currentTimeStamp = "" + currentTime;
+        if(lastSendTime == 0 || Math.abs(currentTime - lastSendTime) > 5000){
+            sendMessage(currentTimeStamp);
+            Log.d("Shake", "Sent" + shakeSignalQueue.size());
+            lastSendTime = currentTime;
+        }
+//        sendMessage(currentTimeStamp);
+//        stopAccelerometer();
+//        SystemClock.sleep(3000);
+//        startAccelerometer();
 
         /**
          * save raw data to a file
          */
-        Log.d("Shake", "Sent" + shakeSignalQueue.size());
         String record ="";
         LinkedList<Double> copy = new LinkedList<Double>(shakeSignalQueue);
         for (Double signal : copy) {
