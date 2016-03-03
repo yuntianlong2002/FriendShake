@@ -222,11 +222,11 @@ public class WearCallListenerService extends WearableListenerService implements
 
         if (message[0].equals("ID")) {
             Log.d("WearToPhone: ", message[1]);
-            String time_str = ServerValue.TIMESTAMP.get(".sv");
-            last_shake_time = Long.parseLong(time_str);
+            //String time_str = ServerValue.TIMESTAMP.get(".sv");
+            last_shake_time = System.currentTimeMillis();
             //Firebase newRef = myFirebaseRef.child("shake").child(message[1]);
             //last_shake_time = ServerValue.TIMESTAMP.get();
-            Firebase newRef = myFirebaseRef.child("shake").child(time_str);
+            Firebase newRef = myFirebaseRef.child("shake").child(Long.toString(last_shake_time));
             newRef.setValue(UID);
         } else if (message[0].equals(CONFIG_START)){
             UID = message[1];
