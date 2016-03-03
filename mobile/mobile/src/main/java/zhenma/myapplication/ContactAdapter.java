@@ -59,9 +59,8 @@ public class ContactAdapter extends KJAdapter<Contact> implements SectionIndexer
         View v = super.getView(position, convertView, parent);
 
         TextView text = (TextView) v.findViewById(R.id.contact_title);
-//        if (flag) {
         if (flag.get(position) == true) {
-            text.setTextColor(Color.MAGENTA);
+            text.setTextColor(Color.parseColor("#3F51B5"));
         }
         return v;
     }

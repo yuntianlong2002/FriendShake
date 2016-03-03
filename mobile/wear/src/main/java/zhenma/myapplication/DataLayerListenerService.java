@@ -105,7 +105,7 @@ public class DataLayerListenerService extends WearableListenerService {
 
         // Create the action
         NotificationCompat.Action action =
-                new NotificationCompat.Action.Builder(R.drawable.blue_handshack,
+                new NotificationCompat.Action.Builder(R.drawable.ic_checked,
                         getString(if_friend ? R.string.oldFriendRemind : R.string.acceptButt), actionPendingIntent)
                         .build();
 
