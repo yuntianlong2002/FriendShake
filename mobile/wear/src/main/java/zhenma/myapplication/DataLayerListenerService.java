@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class DataLayerListenerService extends WearableListenerService {
 
-    private static final String TAG = "DataLayerListenerService";
+    private static final String TAG = "DataLayerListener";
 
     private static final String START_ACTIVITY_PATH = "/start-activity";
     private static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";

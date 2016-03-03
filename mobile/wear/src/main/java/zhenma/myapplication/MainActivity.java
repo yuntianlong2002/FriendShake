@@ -408,11 +408,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             record  = record + signal + "\n";
 
         }
-        try {
-            shakeSignalOutputStream.write(record.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //try {
+        //    shakeSignalOutputStream.write(record.getBytes());
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //}
     }
 
 
