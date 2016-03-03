@@ -87,12 +87,16 @@ public class DataLayerListenerService extends WearableListenerService {
         }*/
     }
 
-    public void btnShowNotificationClick(String friend_id){
+    public void btnShowNotificationClick(String friend_id, String name, boolean if_friend){
         int notificationId = 101;
 
         // Create an intent for the reply action
         Intent actionIntent = new Intent(this, MainActivity.class);
-        actionIntent.putExtra("methodName", "sendAcceptMessage");
+        if (if_friend) {
+            actionIntent.putExtra("methodName", "noAction");
+        } else {
+            actionIntent.putExtra("methodName", "sendAcceptMessage");
+        }
         actionIntent.putExtra("friend_id", friend_id);
         actionIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent actionPendingIntent =
@@ -102,14 +106,14 @@ public class DataLayerListenerService extends WearableListenerService {
         // Create the action
         NotificationCompat.Action action =
                 new NotificationCompat.Action.Builder(R.drawable.red_handshack,
-                        getString(R.string.acceptButt), actionPendingIntent)
+                        getString(if_friend ? R.string.oldFriendRemind : R.string.acceptButt), actionPendingIntent)
                         .build();
 
         //Building notification layout
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("New Friend Request!")
+                        .setSmallIcon(if_friend?R.drawable.yellow_handshack:R.drawable.red_handshack)
+                        .setContentTitle(if_friend?"Old Friend: " + name : "New Friend Request: " + name)
                         .setDefaults(Notification.DEFAULT_ALL)
                         .setContentText("Swipe left!")
                         .extend(new NotificationCompat.WearableExtender().addAction(action));
@@ -133,7 +137,9 @@ public class DataLayerListenerService extends WearableListenerService {
         String [] message = event.split("--");
 
         if (message[0].equals("config/stop")) {
-            btnShowNotificationClick(message[1]);
+            btnShowNotificationClick(message[1],"", false);
+        } else if(message[0].equals("OLD_FRIEND")){
+            btnShowNotificationClick(message[1],message[2], true);
         }
 
         // Check to see if the message is to start an activity

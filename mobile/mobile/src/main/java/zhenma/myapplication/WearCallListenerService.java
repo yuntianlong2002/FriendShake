@@ -15,6 +15,7 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -76,17 +77,46 @@ public class WearCallListenerService extends WearableListenerService implements
         myFirebaseRef.child("shake").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot snapshot, String previousChildKey) {
-                String potential_friend_id = snapshot.getValue(String.class);
+                final String potential_friend_id = snapshot.getValue(String.class);
                 long friend_shake_time = Long.parseLong(snapshot.getKey());
                 if (Math.abs(friend_shake_time - last_shake_time) < 10000 && !UID.equals(potential_friend_id)) {
-                    Firebase newRef = myFirebaseRef.child("vertex").child(UID).child("friendlist").child(potential_friend_id);
-                    newRef.setValue("1");
-                    if (potential_friend_id.compareTo(UID) > 0) {
-                        Firebase newRef_link = myFirebaseRef.child("edge").push();
-                        newRef_link.child("sourceId").setValue(potential_friend_id);
-                        newRef_link.child("targetId").setValue(UID);
-                    }
-                    new SendActivityPhoneMessage(CONFIG_STOP+"--"+potential_friend_id,"").start();
+
+                    //.child("friendlist").child(potential_friend_id).
+                    myFirebaseRef.child("vertex").child(UID).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            boolean already_exist = snapshot.child("friendlist").child(potential_friend_id).exists();
+                            if (already_exist == true) {
+                                myFirebaseRef.child("vertex").child(potential_friend_id).child("label").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot snapshot) {
+                                        String name = snapshot.getValue(String.class);
+                                        new SendActivityPhoneMessage("OLD_FRIEND" + "--" + potential_friend_id + "--" +name,"").start();
+                                    }
+                                    @Override
+                                    public void onCancelled(FirebaseError error) {
+                                    }
+                                });
+
+
+                                //new SendActivityPhoneMessage("OLD_FRIEND" + "--" + potential_friend_id + "--" +name,"").start();
+                            } else {
+                                Firebase newRef = myFirebaseRef.child("vertex").child(UID).child("friendlist").child(potential_friend_id);
+                                newRef.setValue("1");
+                                if (potential_friend_id.compareTo(UID) > 0) {
+                                    Firebase newRef_link = myFirebaseRef.child("edge").push();
+                                    newRef_link.child("sourceId").setValue(potential_friend_id);
+                                    newRef_link.child("targetId").setValue(UID);
+                                }
+                                new SendActivityPhoneMessage(CONFIG_STOP + "--" + potential_friend_id, "").start();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(FirebaseError error) {
+                        }
+                    });
+
                 }
                 //System.out.println("Author: " + newPost.getAuthor());
                 //System.out.println("Title: " + newPost.getTitle());

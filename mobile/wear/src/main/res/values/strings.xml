@@ -4,4 +4,5 @@
     <string name="hello_square">Hello Square World!</string>
     <string name="startShack">Start Shack</string>
     <string name="acceptButt">Accept Request</string>
+    <string name="oldFriendRemind">Ole Friend Reminder</string>
 </resources>
