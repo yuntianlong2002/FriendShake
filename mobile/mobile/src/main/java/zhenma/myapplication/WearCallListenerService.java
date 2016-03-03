@@ -15,6 +15,7 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ServerValue;
 import com.firebase.client.ValueEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -82,6 +83,7 @@ public class WearCallListenerService extends WearableListenerService implements
             public void onChildAdded(DataSnapshot snapshot, String previousChildKey) {
                 final String potential_friend_id = snapshot.getValue(String.class);
                 long friend_shake_time = Long.parseLong(snapshot.getKey());
+                //ServerValue.TIMESTAMP;
                 if (Math.abs(friend_shake_time - last_shake_time) < 10000 && !UID.equals(potential_friend_id)) {
 
                     //.child("friendlist").child(potential_friend_id).
@@ -220,8 +222,11 @@ public class WearCallListenerService extends WearableListenerService implements
 
         if (message[0].equals("ID")) {
             Log.d("WearToPhone: ", message[1]);
-            last_shake_time = Long.parseLong(message[1]);
-            Firebase newRef = myFirebaseRef.child("shake").child(message[1]);
+            String time_str = ServerValue.TIMESTAMP.get(".sv");
+            last_shake_time = Long.parseLong(time_str);
+            //Firebase newRef = myFirebaseRef.child("shake").child(message[1]);
+            //last_shake_time = ServerValue.TIMESTAMP.get();
+            Firebase newRef = myFirebaseRef.child("shake").child(time_str);
             newRef.setValue(UID);
         } else if (message[0].equals(CONFIG_START)){
             UID = message[1];
