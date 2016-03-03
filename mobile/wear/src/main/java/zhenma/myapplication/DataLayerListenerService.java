@@ -101,7 +101,7 @@ public class DataLayerListenerService extends WearableListenerService {
 
         // Create the action
         NotificationCompat.Action action =
-                new NotificationCompat.Action.Builder(R.drawable.red_handshack,
+                new NotificationCompat.Action.Builder(R.drawable.blue_handshack,
                         getString(R.string.acceptButt), actionPendingIntent)
                         .build();
 

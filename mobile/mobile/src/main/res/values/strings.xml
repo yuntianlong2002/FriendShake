@@ -39,5 +39,6 @@
     <string name="profile_photo_file_name">profile_photo.png</string>
     <string name="ui_profile_toast_save_text">profile saved!</string>
     <string name="ui_toast_to_profile">Edit your own profile!</string>
+    <string name="ui_profile_toast_accept_request">Accept friend\'s request</string>
 
 </resources>

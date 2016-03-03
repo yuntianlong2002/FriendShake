@@ -220,7 +220,7 @@ public class MainActivity extends KJActivity implements SideBar
             Intent i;
 
             public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
+                                    int position, long id_for_list) {
                 i = new Intent(MainActivity.this, ProfileActivity.class);
                 // send message to another activity: which picture user take
 //                i.putExtra("gridIndex", PSM.getGridById(index % 3 + 1)[position]);
@@ -229,6 +229,8 @@ public class MainActivity extends KJActivity implements SideBar
                 // start activity
                 i.putExtra("FROM_LIST", true);
                 i.putExtra("UID", ids.get(position));
+                i.putExtra("NOTYETACCEPT", flag.get(position));
+                i.putExtra("MY_UID", id);
                 startActivity(i);
             }
         });
