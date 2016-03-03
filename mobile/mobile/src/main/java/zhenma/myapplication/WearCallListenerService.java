@@ -19,8 +19,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
@@ -84,6 +86,7 @@ public class WearCallListenerService extends WearableListenerService implements
                         newRef_link.child("sourceId").setValue(potential_friend_id);
                         newRef_link.child("targetId").setValue(UID);
                     }
+                    new SendActivityPhoneMessage(CONFIG_STOP+"--"+potential_friend_id,"").start();
                 }
                 //System.out.println("Author: " + newPost.getAuthor());
                 //System.out.println("Title: " + newPost.getTitle());
@@ -203,6 +206,36 @@ public class WearCallListenerService extends WearableListenerService implements
     public void onPeerDisconnected(Node peer) {
         super.onPeerDisconnected(peer);
         Log.v(TAG, "Peer Disconnected " + peer.getDisplayName());
+    }
+
+    class SendActivityPhoneMessage extends Thread {
+        String path;
+        String message;
+
+        // Constructor to send a message to the data layer
+        SendActivityPhoneMessage(String p, String msg) {
+            path = p;
+            message = msg;
+        }
+
+        public void run() {
+            //NodeApi.GetLocalNodeResult nodes = Wearable.NodeApi.getLocalNode(mGoogleApiClient).await();
+            NodeApi.GetConnectedNodesResult nodes =
+                    Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+            //Node node = nodes.getNode();
+            //Collection<String> nodes = getNodes();
+            for (Node node : nodes.getNodes()) {
+                Log.v(TAG, "Activity Node is : " + node.getId() + " - " + node.getDisplayName());
+                MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, message.getBytes()).await();
+                if (result.getStatus().isSuccess()) {
+                    Log.v(TAG, "Activity Message: {" + message + "} sent to: " + node.getDisplayName());
+                } else {
+                    // Log an error
+                    Log.v(TAG, "ERROR: failed to send Activity Message");
+                }
+            }
+
+        }
     }
 
 }
