@@ -15,7 +15,9 @@
  */
 package zhenma.myapplication;
 
+import android.graphics.Color;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.SectionIndexer;
@@ -39,14 +41,29 @@ public class ContactAdapter extends KJAdapter<Contact> implements SectionIndexer
 
     private KJBitmap kjb = new KJBitmap();
     private ArrayList<Contact> datas;
+    private boolean flag;
 
-    public ContactAdapter(AbsListView view, ArrayList<Contact> mDatas) {
+    public ContactAdapter(AbsListView view, ArrayList<Contact> mDatas, boolean mFlag) {
         super(view, mDatas, R.layout.item_list_contact);
         datas = mDatas;
+        flag = mFlag;
         if (datas == null) {
             datas = new ArrayList<>();
         }
         Collections.sort(datas);
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        View v = super.getView(position, convertView, parent);
+
+        TextView text = (TextView) v.findViewById(R.id.contact_title);
+//        if (flag) {
+        if (position == 1) {
+            text.setTextColor(Color.MAGENTA);
+        }
+        return v;
     }
 
     @Override

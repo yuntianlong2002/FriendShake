@@ -50,6 +50,7 @@ public class MainActivity extends KJActivity implements SideBar
     private KJHttp kjh = null;
     private String id;
     private Firebase myFirebaseRef;
+    private int already_accept;
 
     private static final String TAG = "PhoneActivity";
     public static final String CONFIG_START = "config/start";
@@ -143,14 +144,14 @@ public class MainActivity extends KJActivity implements SideBar
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     //Contact data = new Contact();
                     String friend_id = postSnapshot.getKey();
-                    int already_accept = postSnapshot.getValue(Integer.class);
+                    already_accept = postSnapshot.getValue(Integer.class);
                     //UserProfile facts = postSnapshot.getValue(UserProfile.class);
                     //System.out.println(facts.getLabel());
                     //data.setName(facts.getLabel());
                     //data.setPinyin(facts.getLabel());
                     //data.setUrl(id);
                     //datas.add(data);
-                    if(already_accept == 0) {
+                    if(already_accept == 1) {
                         ids.add(friend_id);
                         System.out.println(friend_id);
                     }
@@ -253,7 +254,7 @@ public class MainActivity extends KJActivity implements SideBar
                     data.setPinyin(facts.getLabel());
                     datas.add(data);
                     mFooterView.setText(datas.size() + " friends");
-                    mAdapter = new ContactAdapter(mListView, datas);
+                    mAdapter = new ContactAdapter(mListView, datas, already_accept == 1);
                     mListView.setAdapter(mAdapter);
                 }
                 @Override
