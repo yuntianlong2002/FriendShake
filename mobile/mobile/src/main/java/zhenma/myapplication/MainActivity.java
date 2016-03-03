@@ -143,14 +143,17 @@ public class MainActivity extends KJActivity implements SideBar
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     //Contact data = new Contact();
                     String friend_id = postSnapshot.getKey();
+                    int already_accept = postSnapshot.getValue(Integer.class);
                     //UserProfile facts = postSnapshot.getValue(UserProfile.class);
                     //System.out.println(facts.getLabel());
                     //data.setName(facts.getLabel());
                     //data.setPinyin(facts.getLabel());
                     //data.setUrl(id);
                     //datas.add(data);
-                    ids.add(friend_id);
-                    System.out.println(friend_id);
+                    if(already_accept == 0) {
+                        ids.add(friend_id);
+                        System.out.println(friend_id);
+                    }
                 }
                 parser(ids);
             }

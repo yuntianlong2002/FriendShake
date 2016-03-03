@@ -150,6 +150,10 @@ public class WearCallListenerService extends WearableListenerService implements
         } else if (message[0].equals(CONFIG_START)){
             UID = message[1];
             Log.d("Got UID: ", UID);
+        } else if (message[0].equals("AcceptSignal")) {
+            //message 1 is the target friend ID
+            Firebase newRef = myFirebaseRef.child("vertex").child(UID).child("friendlist").child(message[1]);
+            newRef.setValue("0");
         }
     }
 
