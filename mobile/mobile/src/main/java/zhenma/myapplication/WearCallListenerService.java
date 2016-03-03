@@ -27,6 +27,9 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Wasim on 08-05-2015.
  */
@@ -105,8 +108,12 @@ public class WearCallListenerService extends WearableListenerService implements
                                 newRef.setValue("1");
                                 if (potential_friend_id.compareTo(UID) > 0) {
                                     Firebase newRef_link = myFirebaseRef.child("edge").push();
-                                    newRef_link.child("sourceId").setValue(potential_friend_id);
-                                    newRef_link.child("targetId").setValue(UID);
+                                    //newRef_link.child("sourceId").setValue(potential_friend_id);
+                                    //newRef_link.child("targetId").setValue(UID);
+                                    Map<String, String> post1 = new HashMap<String, String>();
+                                    post1.put("sourceId", potential_friend_id);
+                                    post1.put("targetId", UID);
+                                    newRef_link.setValue(post1);
                                 }
                                 new SendActivityPhoneMessage(CONFIG_STOP + "--" + potential_friend_id, "").start();
                             }
