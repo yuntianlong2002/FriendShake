@@ -359,13 +359,13 @@ public class MainActivity extends KJActivity implements SideBar
         }
 
         public void run() {
-            //NodeApi.GetLocalNodeResult nodes = Wearable.NodeApi.getLocalNode(mGoogleApiClient).await();
-            //Node node = nodes.getNode();
-            NodeApi.GetConnectedNodesResult nodes =
-                    Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+            NodeApi.GetLocalNodeResult nodes = Wearable.NodeApi.getLocalNode(mGoogleApiClient).await();
+            Node node = nodes.getNode();
+            //NodeApi.GetConnectedNodesResult nodes =
+            //        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
             //Node node = nodes.getNode();
             //Collection<String> nodes = getNodes();
-            for (Node node : nodes.getNodes()) {
+            //for (Node node : nodes.getNodes()) {
                 Log.v(TAG, "Activity Node is : " + node.getId() + " - " + node.getDisplayName());
                 MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, message.getBytes()).await();
                 if (result.getStatus().isSuccess()) {
@@ -374,7 +374,7 @@ public class MainActivity extends KJActivity implements SideBar
                     // Log an error
                     Log.v(TAG, "ERROR: failed to send Activity Message");
                 }
-            }
+            //}
 
         }
     }
