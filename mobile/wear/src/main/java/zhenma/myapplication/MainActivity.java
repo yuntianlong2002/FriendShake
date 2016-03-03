@@ -141,7 +141,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                             stopAccelerometer();
                             appIcon.setImageResource(R.drawable.blue_handshack);
                             accelButton.setChecked(false);
-                            btnShowNotificationClick();
+
                         }
                     }
                 }
@@ -415,71 +415,41 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         }
     }
 
-    public void btnShowNotificationClick(){
-        int notificationId = 101;
 
-        // Create an intent for the reply action
-        Intent actionIntent = new Intent(this, MainActivity.class);
-        actionIntent.putExtra("methodName", "sendAcceptMessage");
-        actionIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent actionPendingIntent =
-                PendingIntent.getActivity(this, 0, actionIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Create the action
-        NotificationCompat.Action action =
-                new NotificationCompat.Action.Builder(R.drawable.red_handshack,
-                        getString(R.string.acceptButt), actionPendingIntent)
-                        .build();
-
-        //Building notification layout
-        NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("New Friend Request!")
-                        .setDefaults(Notification.DEFAULT_ALL)
-                        .setContentText("Swipe left!")
-                        .extend(new NotificationCompat.WearableExtender().addAction(action));
-
-
-        // instance of the NotificationManager service
-        NotificationManagerCompat notificationManager =
-                NotificationManagerCompat.from(this);
-
-        // Build the notification and notify it using notification manager.
-        notificationManager.notify(notificationId, notificationBuilder.build());
-        Log.d("Notification", "Notify Sent!");
-    }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.d("WearToPhone", "I am in send accept message method!");
         if(intent.getStringExtra("methodName").equals("sendAcceptMessage")){
-            sendAcceptMessage();
+            sendAcceptMessage(intent.getStringExtra("friend_id"));
         }
     }
 
-    private void sendAcceptMessage() {
+    private void sendAcceptMessage(String friend_id) {
         mGoogleApiClient.connect();
-        Log.d("WearToPhone", "I am in send accept message method!");
-        Log.d("WearToPhone", "-- " + mGoogleApiClient.isConnected());
-        if (mNode != null && mGoogleApiClient!= null && mGoogleApiClient.isConnected()) {
+        NodeApi.GetConnectedNodesResult nodes =
+                Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+        for (Node node : nodes.getNodes()) {
+            Log.d("WearToPhone", "I am in send accept message method!");
             Log.d("WearToPhone", "-- " + mGoogleApiClient.isConnected());
-            Wearable.MessageApi.sendMessage(
-                    mGoogleApiClient, mNode.getId(), "AcceptSignal" + "--" + "Accept!", null).setResultCallback(
+            if (node != null && mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+                Log.d("WearToPhone", "-- " + mGoogleApiClient.isConnected());
+                Wearable.MessageApi.sendMessage(
+                        mGoogleApiClient, node.getId(), "AcceptSignal" + "--" + friend_id, null).setResultCallback(
 
-                    new ResultCallback<MessageApi.SendMessageResult>() {
-                        @Override
-                        public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                        new ResultCallback<MessageApi.SendMessageResult>() {
+                            @Override
+                            public void onResult(MessageApi.SendMessageResult sendMessageResult) {
 
-                            if (!sendMessageResult.getStatus().isSuccess()) {
-                                Log.e("WearToPhone", "Failed to send message with status code: "
-                                        + sendMessageResult.getStatus().getStatusCode());
+                                if (!sendMessageResult.getStatus().isSuccess()) {
+                                    Log.e("WearToPhone", "Failed to send message with status code: "
+                                            + sendMessageResult.getStatus().getStatusCode());
+                                }
                             }
                         }
-                    }
-            );
+                );
+            }
         }
     }
 }
