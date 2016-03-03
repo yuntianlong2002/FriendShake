@@ -422,11 +422,42 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         super.onNewIntent(intent);
         Log.d("WearToPhone", "I am in send accept message method!");
         if(intent.getStringExtra("methodName").equals("sendAcceptMessage")){
-            sendAcceptMessage(intent.getStringExtra("friend_id"));
+            //sendAcceptMessage(intent.getStringExtra("friend_id"));
+            new SendActivityPhoneMessage("AcceptSignal" + "--" + intent.getStringExtra("friend_id"),"").start();
         }
     }
 
-    private void sendAcceptMessage(String friend_id) {
+    class SendActivityPhoneMessage extends Thread {
+        String path;
+        String message;
+
+        // Constructor to send a message to the data layer
+        SendActivityPhoneMessage(String p, String msg) {
+            path = p;
+            message = msg;
+        }
+
+        public void run() {
+            //NodeApi.GetLocalNodeResult nodes = Wearable.NodeApi.getLocalNode(mGoogleApiClient).await();
+            NodeApi.GetConnectedNodesResult nodes =
+                    Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+            //Node node = nodes.getNode();
+            //Collection<String> nodes = getNodes();
+            for (Node node : nodes.getNodes()) {
+                Log.v("Wearable", "Activity Node is : " + node.getId() + " - " + node.getDisplayName());
+                MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, message.getBytes()).await();
+                if (result.getStatus().isSuccess()) {
+                    Log.v("Wearable", "Activity Message: {" + message + "} sent to: " + node.getDisplayName());
+                } else {
+                    // Log an error
+                    Log.v("Wearable", "ERROR: failed to send Activity Message");
+                }
+            }
+
+        }
+    }
+
+    /*private void sendAcceptMessage(String friend_id) {
         mGoogleApiClient.connect();
         NodeApi.GetConnectedNodesResult nodes =
                 Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
@@ -451,5 +482,5 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 );
             }
         }
-    }
+    }*/
 }
