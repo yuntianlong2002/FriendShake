@@ -81,8 +81,8 @@ public class WearCallListenerService extends WearableListenerService implements
                 if (Math.abs(friend_shake_time - last_shake_time) < 10000 && !UID.equals(potential_friend_id)) {
                     Firebase newRef = myFirebaseRef.child("vertex").child(UID).child("friendlist").child(potential_friend_id);
                     newRef.setValue("1");
-                    Firebase newRef_link = myFirebaseRef.child("edge").push();
                     if (potential_friend_id.compareTo(UID) > 0) {
+                        Firebase newRef_link = myFirebaseRef.child("edge").push();
                         newRef_link.child("sourceId").setValue(potential_friend_id);
                         newRef_link.child("targetId").setValue(UID);
                     }

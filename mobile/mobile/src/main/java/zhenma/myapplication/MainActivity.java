@@ -56,6 +56,8 @@ public class MainActivity extends KJActivity implements SideBar
     public static final String CONFIG_START = "config/start";
     public static final String CONFIG_STOP= "config/stop";
 
+    ArrayList<Boolean> flag = new ArrayList<Boolean>();
+
     GoogleApiClient mGoogleApiClient;
 
     @JsonIgnoreProperties({ "friendlist" })
@@ -133,6 +135,7 @@ public class MainActivity extends KJActivity implements SideBar
         Intent intent = getIntent();
         id = "";
         id = intent.getStringExtra("UID");
+        //¸flag = new
         myFirebaseRef = new Firebase("https://graphdata.firebaseio.com/");
 
         myFirebaseRef.child("vertex").child(id).child("friendlist").addValueEventListener(new ValueEventListener() {
@@ -141,6 +144,8 @@ public class MainActivity extends KJActivity implements SideBar
                 System.out.println(snapshot.getValue());  //prints "Do you have data? You'll love Firebase."
                 System.out.println("There are " + snapshot.getChildrenCount() + " blog posts");
                 ids.clear();
+                flag.clear();
+
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     //Contact data = new Contact();
                     String friend_id = postSnapshot.getKey();
@@ -151,10 +156,11 @@ public class MainActivity extends KJActivity implements SideBar
                     //data.setPinyin(facts.getLabel());
                     //data.setUrl(id);
                     //datas.add(data);
-                    if(already_accept == 1) {
-                        ids.add(friend_id);
-                        System.out.println(friend_id);
-                    }
+                    //if(already_accept == 1) {
+                    ids.add(friend_id);
+                    flag.add(already_accept==1?true:false);
+                    //System.out.println(friend_id);
+                    //}
                 }
                 parser(ids);
             }
@@ -254,7 +260,7 @@ public class MainActivity extends KJActivity implements SideBar
                     data.setPinyin(facts.getLabel());
                     datas.add(data);
                     mFooterView.setText(datas.size() + " friends");
-                    mAdapter = new ContactAdapter(mListView, datas, already_accept == 1);
+                    mAdapter = new ContactAdapter(mListView, datas, flag);
                     mListView.setAdapter(mAdapter);
                 }
                 @Override

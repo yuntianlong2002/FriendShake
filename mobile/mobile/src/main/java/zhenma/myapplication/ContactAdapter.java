@@ -41,9 +41,9 @@ public class ContactAdapter extends KJAdapter<Contact> implements SectionIndexer
 
     private KJBitmap kjb = new KJBitmap();
     private ArrayList<Contact> datas;
-    private boolean flag;
+    private ArrayList<Boolean> flag;
 
-    public ContactAdapter(AbsListView view, ArrayList<Contact> mDatas, boolean mFlag) {
+    public ContactAdapter(AbsListView view, ArrayList<Contact> mDatas, ArrayList<Boolean> mFlag) {
         super(view, mDatas, R.layout.item_list_contact);
         datas = mDatas;
         flag = mFlag;
@@ -60,7 +60,7 @@ public class ContactAdapter extends KJAdapter<Contact> implements SectionIndexer
 
         TextView text = (TextView) v.findViewById(R.id.contact_title);
 //        if (flag) {
-        if (position == 1) {
+        if (flag.get(position) == true) {
             text.setTextColor(Color.MAGENTA);
         }
         return v;
