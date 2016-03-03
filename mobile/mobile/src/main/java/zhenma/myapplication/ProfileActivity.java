@@ -363,6 +363,8 @@ public class ProfileActivity extends AppCompatActivity {
         Intent intent = getIntent();
         id = "";
         id = intent.getStringExtra("UID");
+        final String MY_UID = intent.getStringExtra("MY_UID");
+
         setContentView(R.layout.activity_profile);
         mImageView = (ImageView) findViewById(R.id.imageProfile);
         if(savedInstanceState != null)
@@ -374,30 +376,56 @@ public class ProfileActivity extends AppCompatActivity {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         Bundle extras = getIntent().getExtras();
         boolean fromList = false;
+        boolean notyetaccept = false;
         if (extras != null){
             fromList = extras.getBoolean("FROM_LIST");
+            notyetaccept = extras.getBoolean("NOTYETACCEPT");
         }
+
         if (fromList){
-            CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-            p.setAnchorId(View.NO_ID);
-            fab.setLayoutParams(p);
-            fab.setVisibility(View.GONE);
-        }
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Save profile
-                saveProfile(id);
-                // Making a "toast" informing the user the profile is saved.
-                Toast.makeText(getApplicationContext(),
-                        getString(R.string.ui_profile_toast_save_text),
-                        Toast.LENGTH_SHORT).show();
-                // Close the activity
+            if(!notyetaccept){
+                CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+                p.setAnchorId(View.NO_ID);
+                fab.setLayoutParams(p);
+                fab.setVisibility(View.GONE);
+            }else{
+                fab.setImageResource(R.drawable.ic_accept);
+                fab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Firebase newRef = myFirebaseRef.child("vertex").child(MY_UID).child("friendlist").child(id);
+                        newRef.setValue("0");
+                        // Making a "toast" informing the user the profile is saved.
+                        Toast.makeText(getApplicationContext(),
+                                getString(R.string.ui_profile_toast_accept_request),
+                                Toast.LENGTH_SHORT).show();
+                        // Close the activity
 //                finish();
-                Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
-                intent.putExtra("UID", id);
-                startActivity(intent);
+                        Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+                        intent.putExtra("UID", MY_UID);
+                        startActivity(intent);
+                    }
+                });
             }
-        });
+        }else{
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Save profile
+                    saveProfile(id);
+                    // Making a "toast" informing the user the profile is saved.
+                    Toast.makeText(getApplicationContext(),
+                            getString(R.string.ui_profile_toast_save_text),
+                            Toast.LENGTH_SHORT).show();
+                    // Close the activity
+//                finish();
+                    Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+                    intent.putExtra("UID", id);
+                    startActivity(intent);
+                }
+            });
+        }
+
     }
 }
