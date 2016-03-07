@@ -66,16 +66,16 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private static boolean isAccelRunning = false;
 
     //Sensor data files
-    private File mRawAccFile;
-    private FileOutputStream mRawAccOutputStream;
+    //private File mRawAccFile;
+    //private FileOutputStream mRawAccOutputStream;
     private LinkedList<double[]> buffer = new LinkedList<>();
 
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     private LinkedList<Double> shakeSignalQueue = new LinkedList<>();
     //Sensor data files
-    private File shakeSignalFile;
-    private FileOutputStream shakeSignalOutputStream;
+    //private File shakeSignalFile;
+    //private FileOutputStream shakeSignalOutputStream;
 
 
 
@@ -109,13 +109,13 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         appIcon = (ImageView) findViewById(R.id.appIcon);
 
         // Init files !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        shakeSignalFile = new File(Environment.getExternalStorageDirectory(), "shake_signal.csv");
-        Log.d("SHAKE_DATA_PATH", shakeSignalFile.getAbsolutePath());
-        try {
-            shakeSignalOutputStream = new FileOutputStream(shakeSignalFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        //shakeSignalFile = new File(Environment.getExternalStorageDirectory(), "shake_signal.csv");
+        //Log.d("SHAKE_DATA_PATH", shakeSignalFile.getAbsolutePath());
+        //try {
+        //    shakeSignalOutputStream = new FileOutputStream(shakeSignalFile);
+        //} catch (FileNotFoundException e) {
+        //    e.printStackTrace();
+        //}
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
@@ -152,7 +152,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         super.onDestroy();
 
         try{
-            shakeSignalOutputStream.close();
+            //shakeSignalOutputStream.close();
             mGoogleApiClient.disconnect();
         }catch (Exception ex)
         {
@@ -336,13 +336,17 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                     fectureVec.clear();
 
                     if(ret == 0.0){
+                        Log.d("Shake" ,"classifyed 0");
                         //sendUpdatedActivityToUI("Standing");
                     }else if(ret == 1.0){
+                        Log.d("Shake" ,"classifyed 1");
                         //sendUpdatedActivityToUI("Walking");
                     }else if(ret == 2.0){
+                        Log.d("Shake" ,"classifyed 2");
                         //sendUpdatedActivityToUI("Running");
                     }else if(ret == 3.0){
 //                        SystemClock.sleep(291);
+                        Log.d("Shake" ,"classifyed 3");
                         sendshakeSignal();
                     }
 
@@ -387,8 +391,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         long currentTime = System.currentTimeMillis();
         String currentTimeStamp = "" + currentTime;
+        Log.d("Shake", "Prepare to send" + currentTimeStamp);
         if(lastSendTime == 0 || Math.abs(currentTime - lastSendTime) > 5000){
-            sendMessage(currentTimeStamp);
+            Log.d("Shake", "Going to send last: " + lastSendTime);
+            //sendMessage(currentTimeStamp);
+            new SendActivityPhoneMessage("ID" + "--" + currentTimeStamp,"").start();
             Log.d("Shake", "Sent" + shakeSignalQueue.size());
             lastSendTime = currentTime;
         }
@@ -419,7 +426,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.d("WearToPhone", "I am in send accept message method!");
-        if(intent.getStringExtra("methodName").equals("sendAcceptMessage")){
+        if(intent!=null && intent.getStringExtra("methodName")!=null && intent.getStringExtra("methodName").equals("sendAcceptMessage")){
             //sendAcceptMessage(intent.getStringExtra("friend_id"));
             new SendActivityPhoneMessage("AcceptSignal" + "--" + intent.getStringExtra("friend_id"),"").start();
         }
@@ -437,6 +444,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         public void run() {
             //NodeApi.GetLocalNodeResult nodes = Wearable.NodeApi.getLocalNode(mGoogleApiClient).await();
+            mGoogleApiClient.connect();
             NodeApi.GetConnectedNodesResult nodes =
                     Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
             //Node node = nodes.getNode();
