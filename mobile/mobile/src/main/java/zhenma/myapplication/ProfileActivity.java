@@ -83,14 +83,15 @@ public class ProfileActivity extends AppCompatActivity {
 
     // load image byte array to image view
     private void loadImageToView() {
-        try {
+        /*try {
             ByteArrayInputStream bis = new ByteArrayInputStream(
                     mProfilePictureArray);
             Bitmap bmap = BitmapFactory.decodeStream(bis);
             mImageView.setImageBitmap(bmap);
             bis.close();
         } catch (Exception ex) {
-        }
+        }*/
+        mImageView.setImageResource(R.drawable.default_profile);
     }
     // convert bitmap to byte array
     private void dumpImage(Bitmap bmap) {
