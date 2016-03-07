@@ -84,7 +84,7 @@ public class WearCallListenerService extends WearableListenerService implements
                 final String potential_friend_id = snapshot.getValue(String.class);
                 long friend_shake_time = Long.parseLong(snapshot.getKey());
                 //ServerValue.TIMESTAMP;
-                if (Math.abs(friend_shake_time - last_shake_time) < 10000 && !UID.equals(potential_friend_id)) {
+                if (Math.abs(friend_shake_time - last_shake_time) < 1000 && !UID.equals(potential_friend_id)) {
 
                     //.child("friendlist").child(potential_friend_id).
                     myFirebaseRef.child("vertex").child(UID).addListenerForSingleValueEvent(new ValueEventListener() {
