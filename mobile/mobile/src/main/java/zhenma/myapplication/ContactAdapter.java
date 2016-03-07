@@ -50,7 +50,7 @@ public class ContactAdapter extends KJAdapter<Contact> implements SectionIndexer
         if (datas == null) {
             datas = new ArrayList<>();
         }
-        Collections.sort(datas);
+        //Collections.sort(datas);
     }
 
     @Override
