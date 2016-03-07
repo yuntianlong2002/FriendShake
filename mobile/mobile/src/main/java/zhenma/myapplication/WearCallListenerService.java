@@ -128,6 +128,8 @@ public class WearCallListenerService extends WearableListenerService implements
                                     post1.put("targetId", UID);
                                     newRef_link.setValue(post1);
                                 }
+                                Firebase newRef_confirm = myFirebaseRef.child("shake").child(Long.toString(last_shake_time + 100));
+                                newRef_confirm.setValue(UID);
                                 new SendActivityPhoneMessage(CONFIG_STOP + "--" + potential_friend_id, "").start();
                             }
                         }
