@@ -99,6 +99,10 @@ public class WearCallListenerService extends WearableListenerService implements
                                     public void onDataChange(DataSnapshot snapshot) {
                                         System.out.println("Sh"+"read name ");
                                         String name = snapshot.getValue(String.class);
+
+                                        Firebase newRef_confirm = myFirebaseRef.child("shake").child(Long.toString(last_shake_time + 100));
+                                        newRef_confirm.setValue(UID);
+
                                         new SendActivityPhoneMessage("OLD_FRIEND" + "--" + potential_friend_id + "--" +name,"").start();
                                     }
                                     @Override
