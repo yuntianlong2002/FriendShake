@@ -91,10 +91,13 @@ public class WearCallListenerService extends WearableListenerService implements
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
                             boolean already_exist = snapshot.child("friendlist").child(potential_friend_id).exists();
+                            Log.d("Sh","data changes");
                             if (already_exist == true) {
+                                Log.d("Sh","already exist");
                                 myFirebaseRef.child("vertex").child(potential_friend_id).child("label").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot snapshot) {
+                                        Log.d("Sh","read name");
                                         String name = snapshot.getValue(String.class);
                                         new SendActivityPhoneMessage("OLD_FRIEND" + "--" + potential_friend_id + "--" +name,"").start();
                                     }
