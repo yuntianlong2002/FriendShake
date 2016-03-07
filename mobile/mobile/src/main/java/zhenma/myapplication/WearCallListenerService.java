@@ -90,9 +90,13 @@ public class WearCallListenerService extends WearableListenerService implements
                     myFirebaseRef.child("vertex").child(UID).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
-                            boolean already_exist = snapshot.child("friendlist").child(potential_friend_id).exists();
-                            System.out.println("Sh"+"data changes");
-                            if (already_exist == true) {
+                            boolean already_exist = false;
+                            already_exist = snapshot.child("friendlist").child(potential_friend_id).exists();
+                            String notyetaccept = "1";
+                            if(already_exist==true)
+                                notyetaccept = snapshot.child("friendlist").child(potential_friend_id).getValue(String.class);
+                            //System.out.println("Sh"+"data changes");
+                            if (already_exist == true && notyetaccept.equals("0")) {
                                 System.out.println("Sh" + "already exist");
                                 myFirebaseRef.child("vertex").child(potential_friend_id).child("label").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
